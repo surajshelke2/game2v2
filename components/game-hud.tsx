@@ -55,10 +55,13 @@ export function GameHUD({
       </div>
 
       <div className="flex-1 text-right">
+           <div className="text-sm text-purple-100">
+        Time Left
+        </div> 
         <div className={`text-xl font-bold ${getTimerColor()}`}>{formatTime(timeRemaining)}</div>
-        <div className="text-xs text-purple-100">
+        {/* <div className="text-xs text-purple-100">
           {currentLevelCorrect}/{currentLevelTotal} correct
-        </div>
+        </div> */}
       </div>
     </div>
   )

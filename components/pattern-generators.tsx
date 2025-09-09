@@ -20,7 +20,7 @@ export interface PatternCompletion {
 
 export interface PatternChallenge {
   id: string
-  type: "rotation-check" | "pattern-arithmetic"
+  type: "rotation-check" | "pattern-arithmetic" | "grid-symmetry"
   patterns: (GridPattern | LinePattern)[]
   completion?: PatternCompletion
   correctAnswer: boolean | number
@@ -146,6 +146,17 @@ export function isGridRotationallySymmetric(grid: boolean[][]): boolean {
   return true
 }
 
+function gridsEqual(a: boolean[][], b: boolean[][]): boolean {
+  const size = a.length
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < size; c++) {
+      if (a[r][c] !== b[r][c]) return false
+    }
+  }
+  return true
+}
+
+
 // Generate a complete pattern challenge
 export function generatePatternChallenge(
   level: number,
@@ -179,11 +190,13 @@ export function generatePatternChallenge(
       pattern2.grid = rotateGrid90(pattern2.grid)
     }
 
+    const correctAnswer = gridsEqual(pattern1.grid, pattern2.grid);
+
     return {
       id: `rotation-${Date.now()}-${Math.random()}`,
       type: "rotation-check",
       patterns: [pattern1, pattern2],
-      correctAnswer: shouldRotate,
+      correctAnswer,
       difficulty,
     }
   }

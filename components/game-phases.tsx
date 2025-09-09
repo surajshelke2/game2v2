@@ -29,7 +29,6 @@ export function BlinkingDots({
   blinkTimeLeft,
   totalBlinkTime,
 }: BlinkingDotsProps) {
-  const progress = ((totalBlinkTime - blinkTimeLeft) / totalBlinkTime) * 100
 
   return (
     <>
@@ -39,20 +38,20 @@ export function BlinkingDots({
         return (
           <div
             key={index}
-            className={`absolute rounded-full transition-colors duration-200 w-0 ${
+            className={`absolute rounded-full transition-colors duration-200 ${
               isCurrentlyBlinking ? "bg-green-500" : "bg-gray-400"
             }`}
             style={{
               left: `${pos.x}px`,
               top: `${pos.y}px`,
-              width: "24px",
-              height: "24px",
+              width: "32px",
+              height: "32px",
               transform: "translate(-50%, -50%)",
             }}
           />
         )
       })}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-64">
+      {/* <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-64">
         <div className="text-center mb-2">
           <div className="text-sm text-gray-600">Memorize the sequence</div>
         </div>
@@ -62,7 +61,7 @@ export function BlinkingDots({
             style={{ width: `${progress}%` }}
           />
         </div>
-      </div>
+      </div> */}
     </>
   )
 }
@@ -73,6 +72,7 @@ interface PatternPhaseProps {
   currentSequenceIndex: number
   symmetryTimeLeft: number
   onAnswer: (answer: boolean) => void
+  showAnswers: boolean
 }
 
 export function PatternPhase({
@@ -81,6 +81,7 @@ export function PatternPhase({
   currentSequenceIndex,
   symmetryTimeLeft,
   onAnswer,
+  showAnswers = false,
 }: PatternPhaseProps) {
   const currentChallenge = patternChallenges[currentSequenceIndex]
 
@@ -100,6 +101,7 @@ export function PatternPhase({
         }
         onAnswer={onAnswer}
         timeLeft={symmetryTimeLeft}
+        
       />
     )
   }
@@ -122,8 +124,6 @@ export function PatternPhase({
           ))}
         </div>
 
-        <div className="text-2xl font-bold">vs</div>
-
         <div className="relative w-48 h-48 border-2 border-gray-300 bg-gray-50 p-4">
           {symmetryPatterns[currentSequenceIndex]?.dots.map((dot, index) => (
             <div
@@ -141,7 +141,6 @@ export function PatternPhase({
 
       <div className="text-center">
         <div className="text-lg font-medium mb-2">Are these patterns symmetric?</div>
-        <div className="text-sm text-gray-500 mb-3">Time left: {symmetryTimeLeft}s</div>
         <div className="flex gap-4">
           <Button onClick={() => onAnswer(true)} className="bg-green-600 hover:bg-green-700" size="lg">
             Yes
@@ -160,33 +159,46 @@ interface RecallPhaseProps {
   playerSelections: number[]
   blinkingDots: number[]
   onDotClick: (index: number) => void
+  showAnswers?: boolean
 }
 
-export function RecallPhase({ dotPositions, playerSelections, blinkingDots, onDotClick }: RecallPhaseProps) {
+export function RecallPhase({ dotPositions, playerSelections, blinkingDots, onDotClick, showAnswers = false }: RecallPhaseProps) {
   return (
     <>
       {dotPositions.map((pos, index) => {
         const wasSelected = playerSelections.includes(index)
         const wasCorrect = wasSelected && blinkingDots.includes(index)
         const wasWrong = wasSelected && !blinkingDots.includes(index)
+        const shouldShowCorrect = showAnswers && blinkingDots.includes(index) // show correct answers when showAnswers is true
 
         return (
           <div
             key={index}
-            className={`absolute rounded-full cursor-pointer transition-colors duration-200 w-7 h-7 ${
-              wasCorrect ? "bg-green-600" : wasWrong ? "bg-red-500" : "bg-gray-400 hover:bg-gray-500"
+              className={`absolute rounded-full cursor-pointer transition-colors duration-200 flex items-center justify-center ${
+              wasCorrect
+                ? "bg-green-600"
+                : wasWrong
+                  ? "bg-red-500"
+                  : shouldShowCorrect
+                    ? "bg-green-400"
+                    : // highlight correct answers
+                      "bg-gray-400 hover:bg-gray-500"
             }`}
             style={{
               left: `${pos.x}px`,
               top: `${pos.y}px`,
-              width: "24px",
-              height: "24px",
+              width: "30px",
+              height: "30px",
               transform: "translate(-50%, -50%)",
             }}
             onClick={() => onDotClick(index)}
-          />
+            >
+            {wasWrong && <div className="text-white font-bold text-lg">×</div>}
+          </div>
         )
       })}
     </>
   )
 }
+
+
